@@ -1,2 +1,3 @@
-# haskell
+# Haskell
+
 Learning Haskell :school:
