@@ -1,3 +1,3 @@
-# Haskell
+# Haskell :school:
 
-Learning Haskell :school:
+Playground for working through Haskell from the First Principles
