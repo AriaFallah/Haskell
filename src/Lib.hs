@@ -96,8 +96,8 @@ safeTail (_:xs) = Just xs
 replaceWord :: String -> String -> String -> String
 replaceWord target replacement word =
   if word == target
-  then replacement
-  else word
+    then replacement
+    else word
 
 replaceThe :: String -> String
 replaceThe s = unwords $ map (replaceWord "the" "a") $ words s
@@ -107,19 +107,49 @@ countThe = foldl' (\ occs word -> if word == "the" then occs + 1 else occs) 0 . 
 
 startsWithVowel :: String -> Bool
 startsWithVowel []    = False
-startsWithVowel (s:_) = s `elem` ['a', 'e', 'i', 'o', 'u']
+startsWithVowel (s:_) = s `elem` "aeiou"
 
 countWordBeforeVowel :: String -> [String] -> Integer
 countWordBeforeVowel _ []       = 0
 countWordBeforeVowel _ [x]      = 0
 countWordBeforeVowel t (x:y:xs) =
   if x == t && startsWithVowel y
-  then countWordBeforeVowel t xs + 1
-  else countWordBeforeVowel t xs
+    then countWordBeforeVowel t xs + 1
+    else countWordBeforeVowel t xs
 
 countTheBeforeVowel :: String -> Integer
 countTheBeforeVowel = countWordBeforeVowel "the" . words
 
+isVowel :: Char -> Bool
+isVowel c = c `elem` "aeiou"
+
+countVowels :: String -> Integer
+countVowels []     = 0
+countVowels (x:xs) =
+  if isVowel x
+    then countVowels xs + 1
+    else countVowels xs
+
+countConsonants :: String -> Integer
+countConsonants []     = 0
+countConsonants (x:xs) =
+  if (not . isVowel) x
+    then countConsonants xs + 1
+    else countConsonants xs
+
+-- Validation
+
 newtype Word' =
   Word' String
   deriving (Eq, Show)
+
+countVCs :: String -> (Int, Int)
+countVCs = foldl' f (0, 0)
+  where f (v, c) x = if isVowel x then (v + 1, c ) else (v , c + 1 )
+
+makeWord :: String -> Maybe Word'
+makeWord str =
+  if uncurry (<) counts
+    then Nothing
+    else Just (Word' str)
+  where counts = countVCs str
