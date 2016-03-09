@@ -1,5 +1,8 @@
 module Lib where
 
+import Data.Char
+import Data.List
+
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
 
@@ -47,12 +50,12 @@ data BinaryTree a =
   | Node (BinaryTree a) a (BinaryTree a)
   deriving (Show)
 
-insert :: Ord a => a -> BinaryTree a -> BinaryTree a
-insert b Leaf = Node Leaf b Leaf
-insert b (Node left a right)
+insert' :: Ord a => a -> BinaryTree a -> BinaryTree a
+insert' b Leaf = Node Leaf b Leaf
+insert' b (Node left a right)
   | b == a =  Node left a right
-  | b < a  =  Node (insert b left) a right
-  | b > a  =  Node left a (insert b right)
+  | b < a  =  Node (insert' b left) a right
+  | b > a  =  Node left a (insert' b right)
 
 mapTree :: (a -> b) -> BinaryTree a -> BinaryTree b
 mapTree f Leaf = Leaf
@@ -79,4 +82,44 @@ foldTree _ start Leaf = start
 foldTree f start (Node left x right) = f x (foldTree f start left) (foldTree f start right)
 
 mapTree' :: (a -> b) -> BinaryTree a -> BinaryTree b
-mapTree' f = foldTree (\x l r -> Node l (f x) r) Leaf
+mapTree' f = foldTree (\ x l r -> Node l (f x) r) Leaf
+
+-- Maybe/Either
+
+safeTail :: [a] -> Maybe [a]
+safeTail []     = Nothing
+safeTail [x]    = Nothing
+safeTail (_:xs) = Just xs
+
+-- Strings
+
+replaceWord :: String -> String -> String -> String
+replaceWord target replacement word =
+  if word == target
+  then replacement
+  else word
+
+replaceThe :: String -> String
+replaceThe s = unwords $ map (replaceWord "the" "a") $ words s
+
+countThe :: String -> Integer
+countThe = foldl' (\ occs word -> if word == "the" then occs + 1 else occs) 0 . words
+
+startsWithVowel :: String -> Bool
+startsWithVowel []    = False
+startsWithVowel (s:_) = s `elem` ['a', 'e', 'i', 'o', 'u']
+
+countWordBeforeVowel :: String -> [String] -> Integer
+countWordBeforeVowel _ []       = 0
+countWordBeforeVowel _ [x]      = 0
+countWordBeforeVowel t (x:y:xs) =
+  if x == t && startsWithVowel y
+  then countWordBeforeVowel t xs + 1
+  else countWordBeforeVowel t xs
+
+countTheBeforeVowel :: String -> Integer
+countTheBeforeVowel = countWordBeforeVowel "the" . words
+
+newtype Word' =
+  Word' String
+  deriving (Eq, Show)
