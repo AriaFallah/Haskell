@@ -1,10 +1,6 @@
-module Lib where
+module Misc where
 
-import Data.Char
-import Data.List
-
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+import Data.List (foldl')
 
 sayHello :: String -> IO ()
 sayHello x =
@@ -50,15 +46,16 @@ data BinaryTree a =
   | Node (BinaryTree a) a (BinaryTree a)
   deriving (Show)
 
-insert' :: Ord a => a -> BinaryTree a -> BinaryTree a
-insert' b Leaf = Node Leaf b Leaf
-insert' b (Node left a right)
+insert :: Ord a => a -> BinaryTree a -> BinaryTree a
+insert b Leaf = Node Leaf b Leaf
+insert b (Node left a right)
   | b == a =  Node left a right
-  | b < a  =  Node (insert' b left) a right
-  | b > a  =  Node left a (insert' b right)
+  | b < a  =  Node (insert b left) a right
+  | b > a  =  Node left a (insert b right)
+insert _ Node{} = Leaf
 
 mapTree :: (a -> b) -> BinaryTree a -> BinaryTree b
-mapTree f Leaf = Leaf
+mapTree _ Leaf = Leaf
 mapTree f (Node left x right) = Node (mapTree f left) (f x) (mapTree f right)
 
 testTree :: BinaryTree Integer
@@ -87,8 +84,8 @@ mapTree' f = foldTree (\ x l r -> Node l (f x) r) Leaf
 -- Maybe/Either
 
 safeTail :: [a] -> Maybe [a]
-safeTail []     = Nothing
-safeTail [x]    = Nothing
+safeTail [] = Nothing
+safeTail [_] = Nothing
 safeTail (_:xs) = Just xs
 
 -- Strings
@@ -110,8 +107,8 @@ startsWithVowel []    = False
 startsWithVowel (s:_) = s `elem` "aeiou"
 
 countWordBeforeVowel :: String -> [String] -> Integer
-countWordBeforeVowel _ []       = 0
-countWordBeforeVowel _ [x]      = 0
+countWordBeforeVowel _ [] = 0
+countWordBeforeVowel _ [_] = 0
 countWordBeforeVowel t (x:y:xs) =
   if x == t && startsWithVowel y
     then countWordBeforeVowel t xs + 1
