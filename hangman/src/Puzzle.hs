@@ -11,6 +11,14 @@ type Discovered = [Maybe Char]
 type Guessed = String
 data Puzzle = Puzzle MainWord Discovered Guessed
 
+instance Show Puzzle where
+  show (Puzzle _ discovered guessed) =
+    intersperse ' ' (renderPuzzleChar <$> discovered)
+    ++ " Guessed so far: " ++ guessed
+
+startGame :: String -> IO ()
+startGame = runGame . freshPuzzle . fmap toLower
+
 freshPuzzle :: String -> Puzzle
 freshPuzzle str = Puzzle str (replicate (length str) Nothing) []
 
@@ -74,11 +82,3 @@ runGame puzzle = forever $ do
     [c] -> handleGuess puzzle c >>= runGame
     _ -> putStrLn "Your guess must\
                   \ be a single character"
-
-startGame :: String -> IO ()
-startGame = runGame . freshPuzzle . fmap toLower
-
-instance Show Puzzle where
-  show (Puzzle _ discovered guessed) =
-    intersperse ' ' (renderPuzzleChar <$> discovered)
-    ++ " Guessed so far: " ++ guessed

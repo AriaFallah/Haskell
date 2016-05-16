@@ -3,10 +3,10 @@ module Main where
 import System.Random (randomRIO)
 import Puzzle (startGame)
 
+type WordList = [String]
+
 main :: IO ()
 main = randomWord' >>= startGame
-
-type WordList = [String]
 
 minWordLength :: Int
 minWordLength = 5
